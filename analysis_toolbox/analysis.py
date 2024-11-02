@@ -40,3 +40,55 @@ def track_in_out_flow(node_db):
     plt.tight_layout()
     plt.show()
 
+
+import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
+from collections import defaultdict
+import math
+
+def track_interaction_diversity(contact_db):
+    # Step 1: Collate interactions weekly
+    weekly_interactions = defaultdict(list)
+    for contact in contact_db.contacts:
+        timestamp = datetime.fromisoformat(contact['timestamp'])
+        week_start = timestamp - timedelta(days=timestamp.weekday())
+        week_start_str = week_start.strftime("%Y-%m-%d")
+        weekly_interactions[week_start_str].append(contact['contact_node'])
+    
+    # Initialize lists to store diversity metrics
+    weeks = sorted(weekly_interactions.keys())
+    shannon_entropies = []
+    simpson_indices = []
+    general_diversity = []
+
+    # Step 2: Calculate diversity metrics for each week
+    for week in weeks:
+        interactions = weekly_interactions[week]
+        diversity_metrics = calculate_diversity_metrics(interactions)
+        shannon_entropies.append(diversity_metrics['shannon_entropy'])
+        simpson_indices.append(diversity_metrics['simpson_index'])
+        general_diversity.append(diversity_metrics['general_diversity'])
+
+    # Step 3: Plot general diversity over time
+    plt.figure(figsize=(10, 6))
+    plt.plot(weeks, general_diversity, label='General Diversity', marker='o')
+    plt.xlabel('Week')
+    plt.ylabel('Diversity Metric')
+    plt.title('Interaction Diversity Over Time')
+    plt.xticks(rotation=45)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+    # Plot individual diversity metrics
+    plt.figure(figsize=(10, 6))
+    plt.plot(weeks, shannon_entropies, label='Shannon Entropy', marker='o')
+    plt.plot(weeks, simpson_indices, label='Simpson\'s Index', marker='x')
+    plt.xlabel('Week')
+    plt.ylabel('Diversity Metric')
+    plt.title('Individual Diversity Metrics Over Time')
+    plt.xticks(rotation=45)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
