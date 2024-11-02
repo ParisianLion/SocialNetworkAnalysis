@@ -92,3 +92,48 @@ def track_interaction_diversity(contact_db):
     plt.tight_layout()
     plt.show()
 
+import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
+from collections import defaultdict
+
+def keyword_match_over_time(contact_db, node_db, keywords):
+    # Step 1: Collate interactions weekly
+    weekly_contacts = defaultdict(set)
+    for contact in contact_db.contacts:
+        timestamp = datetime.fromisoformat(contact['timestamp'])
+        week_start = timestamp - timedelta(days=timestamp.weekday())
+        week_start_str = week_start.strftime("%Y-%m-%d")
+        weekly_contacts[week_start_str].add(contact['contact_node'])
+    
+    # Step 2: Keyword matching and counting
+    keyword_counts = {}
+    for week in sorted(weekly_contacts.keys()):
+        count = 0
+        interacted_nodes = weekly_contacts[week]
+        for node_id in interacted_nodes:
+            node_attributes = node_db.nodes.get(node_id, {})
+            interests = node_attributes.get('interests', '').lower()
+            occupation = node_attributes.get('occupation', '').lower()
+            combined_text = interests + ' ' + occupation
+            for keyword in keywords:
+                if keyword.lower() in combined_text:
+                    count += 1
+                    break  # Avoid double-counting the same node
+        keyword_counts[week] = count
+
+    # Step 3: Store counts in a list for future use
+    weeks = sorted(keyword_counts.keys())
+    counts = [keyword_counts[week] for week in weeks]
+
+    # Step 4: Plotting
+    plt.figure(figsize=(10, 6))
+    plt.plot(weeks, counts, marker='o')
+    plt.xlabel('Week')
+    plt.ylabel('Keyword Match Count')
+    plt.title('Keyword Matches in Interacted Nodes Over Time')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
+
+    return counts  # Returning the list of counts for future use
+
