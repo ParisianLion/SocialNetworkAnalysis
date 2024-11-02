@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
-from databases.node_database import NodeDatabase
+from collections import defaultdict
+import math
 
 def track_in_out_flow(node_db):
     # Initialize data structure to store weekly in/out changes
@@ -39,12 +40,6 @@ def track_in_out_flow(node_db):
     plt.legend()
     plt.tight_layout()
     plt.show()
-
-
-import matplotlib.pyplot as plt
-from datetime import datetime, timedelta
-from collections import defaultdict
-import math
 
 def track_interaction_diversity(contact_db):
     # Step 1: Collate interactions weekly
@@ -91,10 +86,6 @@ def track_interaction_diversity(contact_db):
     plt.legend()
     plt.tight_layout()
     plt.show()
-
-import matplotlib.pyplot as plt
-from datetime import datetime, timedelta
-from collections import defaultdict
 
 def keyword_match_over_time(contact_db, node_db, keywords):
     # Step 1: Collate interactions weekly
